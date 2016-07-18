@@ -1,35 +1,21 @@
 'use strict';
 
-function buildCartItems(inputs, allItems) {
+let buildCartItems = (tags, allItems) => {
   let cartItems = [];
 
-  for(let value of inputs) {
+  for(let value of tags) {
     let item = value.split('-');
     let itemCount = (item[1] || 1);
-    let cartItem = findExistItem(item[0], cartItems);
+    let barcode = item[0];
+    let cartItem = cartItems.find(cartItem => cartItem.item.barcode === barcode);
 
     if(cartItem) {
       cartItem.count++ ;
     }else {
-      let existItem = findExist(item[0], allItems);
-      cartItems.push({item: existItem, count: parseInt(itemCount)});
+      let item = allItems.find(item => item.barcode === barcode);
+      cartItems.push({item: item, count: parseFloat(itemCount)});
     }
   }
+  
   return cartItems;
-}
-
-function findExist(item, allItems) {
-  for(let value of allItems) {
-    if(item === value.barcode) {
-      return value;
-    }
-  }
-}
-
-function findExistItem(item, cartItems) {
-  for(let value of cartItems) {
-    if(item === value.item.barcode) {
-      return value;
-    }
-  }
 }
