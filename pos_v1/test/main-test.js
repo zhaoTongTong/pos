@@ -94,12 +94,12 @@ describe('pos', () => {
         count: 2
       }
     ];
-    
+
     let receiptItems = calculatCartItems(cartItems, allPromotions);
 
     const expectReceiptItems = [
       {
-        receipt:
+        cartItem:
         {
           item: {
             barcode: 'ITEM000001',
@@ -113,7 +113,7 @@ describe('pos', () => {
         subTotal: 12.00
       },
       {
-        receipt:
+        cartItem:
         {
           item: {
             barcode: 'ITEM000003',

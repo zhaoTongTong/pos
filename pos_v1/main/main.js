@@ -26,7 +26,7 @@ let calculatCartItems = (cartItems, promotions) => {
     let pomotionType = getPromotionType(cartItem.item.barcode, promotions);
     let {saved, subTotal} = discount(cartItem, pomotionType);
 
-    return {receipt:cartItem, saved: saved, subTotal:subTotal};
+    return {cartItem, saved, subTotal};
   });
 }
 
