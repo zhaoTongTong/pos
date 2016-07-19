@@ -22,17 +22,12 @@ let buildCartItems = (tags, allItems) => {
 }
 
 let calculatCartItems = (cartItems, promotions) => {
-  let receiptItems = [];
-
-  for(let cartItem of cartItems) {
-    let barcode = cartItem.item.barcode;
-    let pomotionType = getPromotionType(barcode, promotions);
+  return cartItems.map(cartItem => {
+    let pomotionType = getPromotionType(cartItem.item.barcode, promotions);
     let {saved, subTotal} = discount(cartItem, pomotionType);
 
-    receiptItems.push({receipt:cartItem, saved: saved, subTotal: subTotal});
-  }
-
-  return receiptItems;
+    return {receipt:cartItem, saved: saved, subTotal:subTotal};
+  });
 }
 
 let getPromotionType = (barcode, promotions) => {
