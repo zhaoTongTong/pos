@@ -3,6 +3,7 @@
 describe('pos', () => {
   let inputs;
   let allItems = loadAllItems();
+  let allPromotions = loadPromotions();
 
   beforeEach(() => {
     inputs = [
@@ -71,4 +72,64 @@ describe('pos', () => {
     ];
     expect(cartItems).toEqual(expectCartItems);
   });
+
+  it('calculatCartItems text', () => {
+    let cartItems = [
+      {
+        item: {
+          barcode: 'ITEM000001',
+          name: '雪碧',
+          unit: '瓶',
+          price: 3.00
+        },
+        count: 5
+      },
+      {
+        item: {
+          barcode: 'ITEM000003',
+          name: '荔枝',
+          unit: '斤',
+          price: 15.00
+        },
+        count: 2
+      }
+    ];
+    
+    let receiptItems = calculatCartItems(cartItems, allPromotions);
+
+    const expectReceiptItems = [
+      {
+        receipt:
+        {
+          item: {
+            barcode: 'ITEM000001',
+            name: '雪碧',
+            unit: '瓶',
+            price: 3.00
+          },
+          count: 5
+        },
+        saved: 3.00,
+        subTotal: 12.00
+      },
+      {
+        receipt:
+        {
+          item: {
+            barcode: 'ITEM000003',
+            name: '荔枝',
+            unit: '斤',
+            price: 15.00
+          },
+          count: 2
+        },
+        saved: 0.00,
+        subTotal: 30.00
+      }
+    ];
+
+    expect(receiptItems).toEqual(expectReceiptItems);
+  });
+
+
 });
