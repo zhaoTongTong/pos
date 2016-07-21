@@ -95,7 +95,7 @@ describe('pos', () => {
       }
     ];
 
-    let receiptItems = calculatCartItems(cartItems, allPromotions);
+    let receiptItems = buildReceiptItems(cartItems, allPromotions);
 
     const expectCartItems = [
       {
@@ -132,7 +132,7 @@ describe('pos', () => {
   });
   
   it('receiptItems build', () => {
-    let cartItems = [
+    let receiptItems = [
       {
         cartItem:
         {
@@ -163,21 +163,21 @@ describe('pos', () => {
       }
     ];
     
-    let receiptItems = getReceiptItems(cartItems);
+    let receipt = buildReceipt(receiptItems);
 
     const expectReceiptItems = {
-      cartItems: cartItems,
+      receiptItems: receiptItems,
       total: 42.00,
       savedTotal : 3.00
     }
 
-    expect(receiptItems).toEqual(expectReceiptItems);
+    expect(receipt).toEqual(expectReceiptItems);
   });
 
   it('print text', () => {
 
     let items = {
-        cartItems: [
+      receiptItems: [
         {
           cartItem:
           {
@@ -211,7 +211,7 @@ describe('pos', () => {
       savedTotal : 3.00
     }
 
-    let text = printItems(items);
+    let text = buildReceiptText(items);
 
     const expectString = `***<没钱赚商店>收据***
 名称：雪碧，数量：5瓶，单价：3.00(元)，小计：12.00(元)

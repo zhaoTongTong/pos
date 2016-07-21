@@ -1,31 +1,31 @@
 'use strict'
 
 function printReceipt(tags) {
-  let allItems = loadAllItems();
-  let promotions = loadPromotions();
-  let cartItems = buildCartItems(tags, allItems);
-  let receiptItems = calculatCartItems(cartItems, promotions);
-  let receipt = getReceiptItems(receiptItems);
+  const allItems = loadAllItems();
+  const promotions = loadPromotions();
+  const cartItems = buildCartItems(tags, allItems);
+  const receiptItems = buildReceiptItems(cartItems, promotions);
+  const receipt = buildReceipt(receiptItems);
 
-  let receiptText = printItems(receipt);
+  const receiptText = buildReceiptText(receipt);
 
   console.log(receiptText);
 
 }
 
-let buildCartItems = (tags, allItems) => {
-  let cartItems = [];
+function buildCartItems(tags, allItems) {
+  const cartItems = [];
 
-  for(let tag of tags) {
-    let splitedTag = tag.split('-');
-    let barcode = splitedTag[0];
-    let count = parseFloat(splitedTag[1] || 1);
-    let cartItem = cartItems.find(cartItem => cartItem.item.barcode === barcode);
+  for(const tag of tags) {
+    const splitedTag = tag.split('-');
+    const barcode = splitedTag[0];
+    const count = parseFloat(splitedTag[1] || 1);
+    const cartItem = cartItems.find(cartItem => cartItem.item.barcode === barcode);
 
     if(cartItem) {
       cartItem.count += count;
     }else {
-      let item = allItems.find(item => item.barcode === barcode);
+      const item = allItems.find(item => item.barcode === barcode);
 
       cartItems.push({item: item, count:count});
     }
@@ -34,65 +34,64 @@ let buildCartItems = (tags, allItems) => {
   return cartItems;
 }
 
-let calculatCartItems = (cartItems, promotions) => {
+function buildReceiptItems(cartItems, promotions) {
   return cartItems.map(cartItem => {
-    let promotionType = getPromotionType(cartItem.item.barcode, promotions);
-    let {saved, subTotal} = discount(cartItem, promotionType);
+    const promotionType = findPromotionType(cartItem.item.barcode, promotions);
+    const {saved, subTotal} = discount(cartItem.count, cartItem.item.price, promotionType);
 
     return {cartItem, saved, subTotal};
   });
 }
 
-let getPromotionType = (barcode, promotions) => {
-  let promotion = promotions.find(promotion => promotion.barcodes.includes(barcode));
+function findPromotionType(barcode, promotions) {
+  const promotion = promotions.find(promotion => promotion.barcodes.some(b => b === barcode));
 
   return promotion ? promotion.type : undefined;
 }
 
-let discount = (cartItem, type) => {
-  let decreasedCount = 0;
+function discount(count, price, type) {
+  let subTotal = count * price;
+  let saved = 0;
 
   if(type === 'BUY_TWO_GET_ONE_FREE') {
-    decreasedCount = parseInt(cartItem.count / 3);
-
+    saved = parseInt(count / 3) * price;
   }
-
-  let saved = decreasedCount * cartItem.item.price;
-  let subTotal = cartItem.item.price * cartItem.count -saved;
+  subTotal -= saved;
 
   return {saved, subTotal};
 }
 
-let getReceiptItems = (cartItems) => {
-  let [total, savedTotal] = [0, 0];
+function buildReceipt(receiptItems) {
+  let total = 0;
+  let savedTotal = 0;
 
-  for(let cartItem of cartItems) {
-    total += cartItem.subTotal;
-    savedTotal += cartItem.saved;
+  for(const receiptItem of receiptItems) {
+    total += receiptItem.subTotal;
+    savedTotal += receiptItem.saved;
   }
 
-  return {cartItems: cartItems, total:total, savedTotal:savedTotal};
+  return {receiptItems, total, savedTotal};
 }
 
 
-let printItems = (receipt) => {
-  let receiptItems = receipt.cartItems.map(receipItem => {
-    return `名称：${receipItem.cartItem.item.name}，\
-数量：${receipItem.cartItem.count}${receipItem.cartItem.item.unit}，\
-单价：${formatMoney(receipItem.cartItem.item.price)}(元)，\
-小计：${formatMoney(receipItem.subTotal)}(元)`;
+function buildReceiptText(receipt) {
+
+  const receiptItems = receipt.receiptItems.map(receiptItem => {
+    const cartItem = receiptItem.cartItem;
+    return `名称：${cartItem.item.name}，\
+数量：${cartItem.count}${cartItem.item.unit}，\
+单价：${formatMoney(cartItem.item.price)}(元)，\
+小计：${formatMoney(receiptItem.subTotal)}(元)`;
   }).join('\n');
 
-  let string = `***<没钱赚商店>收据***
+  return `***<没钱赚商店>收据***
 ${receiptItems}
 ----------------------
 总计：${formatMoney(receipt.total)}(元)
 节省：${formatMoney(receipt.savedTotal)}(元)
-**********************`
-
-  return string;
+**********************`;
 }
 
-let formatMoney = (money) => {
+function formatMoney(money) {
   return money.toFixed(2);
 }
